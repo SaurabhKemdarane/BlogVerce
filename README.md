@@ -14,7 +14,6 @@ BlogVerce aims to provide a user-friendly platform for bloggers to publish their
 - **React Router**: Declarative routing for React.
 - **Tailwind CSS**: Utility-first CSS framework for styling.
 - **Redux**: State management library for managing application state.
-- **Appwrite SDK**: JavaScript SDK for interacting with the Appwrite backend services.
 
 ### Backend
 
