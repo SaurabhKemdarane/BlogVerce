@@ -19,45 +19,36 @@ export default function PostForm({ post }) {
     const userData = useSelector((state) => state.auth.userData);
 
     const submit = async (data) => {
-        try {
-            let fileId;
-    
-          
-            if (data.image && data.image[0]) {
-                const file = await appwriteService.uploadFile(data.image[0]);
-                if (file && file.$id) {
-                    fileId = file.$id;
-                    if (post && post.featuredImage) {
-                        await appwriteService.deleteFile(post.featuredImage);
-                    }
-                }
+        if (post) {
+            const file = data.image[0] ? await appwriteService.uploadFile(data.image[0]) : null;
+
+            if (file) {
+                appwriteService.deleteFile(post.featuredImage);
             }
-    
-      
-            if (post) {
-                const dbPost = await appwriteService.updatePost(post.$id, {
-                    ...data,
-                    featuredImage: fileId ? fileId : post.featuredImage,
-                });
-                if (dbPost) {
-                    navigate(`/post/${dbPost.$id}`);
-                }
-            } else {
-           
-                const dbPost = await appwriteService.createPost({
-                    ...data,
-                    featuredImage: fileId,
-                    userId: userData.$id,
-                });
+
+            const dbPost = await appwriteService.updatePost(post.$id, {
+                ...data,
+                featuredImage: file ? file.$id : undefined,
+            });
+
+            if (dbPost) {
+                navigate(`/post/${dbPost.$id}`);
+            }
+        } else {
+            const file = await appwriteService.uploadFile(data.image[0]);
+
+            if (file) {
+                const fileId = file.$id;
+                data.featuredImage = fileId;
+                const dbPost = await appwriteService.createPost({ ...data, userId: userData.$id });
+
                 if (dbPost) {
                     navigate(`/post/${dbPost.$id}`);
                 }
             }
-        } catch (error) {
-            console.error("Error submitting post:", error);
         }
     };
-    
+
     const slugTransform = useCallback((value) => {
         if (value && typeof value === "string")
             return value

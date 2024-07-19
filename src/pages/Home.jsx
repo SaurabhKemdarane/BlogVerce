@@ -1,48 +1,23 @@
 import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { login } from '../store/authSlice';
 import appwriteService from '../appwrite/config';
-import authService from '../appwrite/auth';
 import { Container, PostCard } from '../components';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import HorizontalLoadingBar from '../components/HorizontalLoadingBar';
 
+
 function Home() {
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
-    const userData = useSelector((state) => state.auth.userData);
-    const dispatch = useDispatch();
 
     useEffect(() => {
-        const fetchPosts = async () => {
-            try {
-                const posts = await appwriteService.getPosts();
-                if (posts) {
-                    setPosts(posts.documents);
-                }
-            } catch (error) {
-                console.error('Error fetching posts:', error);
-            } finally {
-                setLoading(false);
+        appwriteService.getPosts().then((posts) => {
+            if (posts) {
+                setPosts(posts.documents);
             }
-        };
-
-        fetchPosts();
+            setLoading(false);
+        });
     }, []);
-
-    useEffect(() => {
-        const fetchCurrentUser = async () => {
-            try {
-                const currentUser = await authService.getCurrentUser();
-                dispatch(login(currentUser));
-            } catch (error) {
-                console.error('Error fetching current user:', error);
-            }
-        };
-
-        fetchCurrentUser();
-    }, [dispatch]);
 
     if (loading) {
         return (
@@ -56,7 +31,7 @@ function Home() {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center bg-zinc-900 text-white">
                 <Link to='/signup'>
-                    <motion.h1
+                    <motion.h1 
                         className="text-4xl font-bold mb-8"
                         initial={{ opacity: 0, y: -50 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -65,7 +40,7 @@ function Home() {
                         Welcome to BlogVerce
                     </motion.h1>
                 </Link>
-                <motion.div
+                <motion.div 
                     className="max-w-4xl p-8 bg-zinc-800 shadow-md rounded-lg mb-8"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -87,8 +62,8 @@ function Home() {
             <Container>
                 <div className='flex flex-wrap justify-center' style={{ maxHeight: '600px', overflowY: 'auto' }}>
                     {posts.map((post) => (
-                        <motion.div
-                            key={post.$id}
+                        <motion.div 
+                            key={post.$id} 
                             className='p-2 w-full md:w-1/2 lg:w-1/4'
                             initial={{ opacity: 0, y: 50 }}
                             animate={{ opacity: 1, y: 0 }}
