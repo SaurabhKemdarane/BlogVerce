@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import appwriteService from '../appwrite/config';
 import { Container, PostCard } from '../components';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import HorizontalLoadingBar from '../components/HorizontalLoadingBar';
+import Logo from '../components/Logo'; 
 
 
 function Home() {
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
+    const userData = useSelector((state) => state.auth.userData);
 
     useEffect(() => {
         appwriteService.getPosts().then((posts) => {
@@ -27,12 +30,13 @@ function Home() {
         );
     }
 
-    if (posts.length === 0) {
+    if (!userData) {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center bg-zinc-900 text-white">
+                <Logo />
                 <Link to='/signup'>
-                    <motion.h1 
-                        className="text-4xl font-bold mb-8"
+                    <motion.h1
+                        className="text-5xl font-bold mb-8"
                         initial={{ opacity: 0, y: -50 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 1 }}
@@ -40,7 +44,7 @@ function Home() {
                         Welcome to BlogVerce
                     </motion.h1>
                 </Link>
-                <motion.div 
+                <motion.div
                     className="max-w-4xl p-8 bg-zinc-800 shadow-md rounded-lg mb-8"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -57,13 +61,41 @@ function Home() {
         );
     }
 
+    if (userData && posts.length === 0) {
+        return (
+            <div className="min-h-screen flex flex-col items-center justify-center bg-zinc-900 text-white">
+                <Logo />
+                <motion.h1
+                    className="text-5xl font-bold mb-8"
+                    initial={{ opacity: 0, y: -50 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 1 }}
+                >
+                    There are no posts
+                </motion.h1>
+                <Link to='/add-post'>
+                    <motion.button
+                        className="px-6 py-3 bg-blue-500 text-white rounded-lg text-xl"
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.5 }}
+                        whileHover={{ scale: 1.1 }}
+                    >
+                        Add Post
+                    </motion.button>
+                </Link>
+            </div>
+        );
+    }
+
     return (
         <div className='w-full py-8 bg-zinc-800 text-white'>
             <Container>
+                <Logo />
                 <div className='flex flex-wrap justify-center' style={{ maxHeight: '600px', overflowY: 'auto' }}>
                     {posts.map((post) => (
-                        <motion.div 
-                            key={post.$id} 
+                        <motion.div
+                            key={post.$id}
                             className='p-2 w-full md:w-1/2 lg:w-1/4'
                             initial={{ opacity: 0, y: 50 }}
                             animate={{ opacity: 1, y: 0 }}
