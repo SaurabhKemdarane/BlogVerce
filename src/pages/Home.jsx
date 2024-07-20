@@ -75,7 +75,8 @@ function Home() {
                     There are no posts
                 </motion.h1>
                 
-                <a href="/add-post">
+              
+                <Link to='/add-post'>
                     <motion.button
                         className="px-6 py-3 bg-blue-500 text-white rounded-lg text-xl"
                         initial={{ opacity: 0, scale: 0.8 }}
@@ -85,8 +86,8 @@ function Home() {
                     >
                         Add Post
                     </motion.button>
+                </Link>
                
-                </a>
             </div>
         );
     }
