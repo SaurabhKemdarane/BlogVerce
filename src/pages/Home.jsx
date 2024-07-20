@@ -5,22 +5,23 @@ import { Container, PostCard } from '../components';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import HorizontalLoadingBar from '../components/HorizontalLoadingBar';
-import Logo from '../components/Logo'; 
-
+import Logo from '../components/Logo';
 
 function Home() {
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
-    const userData = useSelector((state) => state.auth.userData);
+    const status = useSelector((state) => state.auth.status);
+   
 
     useEffect(() => {
+        setLoading(true);
         appwriteService.getPosts().then((posts) => {
             if (posts) {
                 setPosts(posts.documents);
             }
             setLoading(false);
         });
-    }, []);
+    }, [status]);
 
     if (loading) {
         return (
@@ -30,7 +31,7 @@ function Home() {
         );
     }
 
-    if (!userData) {
+    if (!status) {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center bg-zinc-900 text-white">
                 <Logo />
@@ -60,8 +61,8 @@ function Home() {
             </div>
         );
     }
-
-    if (userData && posts.length === 0) {
+ 
+    if (posts.length === 0) {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center bg-zinc-900 text-white">
                 <Logo />
@@ -73,7 +74,8 @@ function Home() {
                 >
                     There are no posts
                 </motion.h1>
-                <Link to='/add-post'>
+                
+                <a href="/add-post">
                     <motion.button
                         className="px-6 py-3 bg-blue-500 text-white rounded-lg text-xl"
                         initial={{ opacity: 0, scale: 0.8 }}
@@ -83,10 +85,13 @@ function Home() {
                     >
                         Add Post
                     </motion.button>
-                </Link>
+               
+                </a>
             </div>
         );
     }
+
+
 
     return (
         <div className='w-full py-8 bg-zinc-800 text-white'>
@@ -110,5 +115,6 @@ function Home() {
         </div>
     );
 }
+
 
 export default Home;

@@ -30,7 +30,7 @@ export class AuthService {
 
     async login({ email, password }) {
         try {
-            console.log('Available methods on account:', Object.keys(this.account));
+           
 
             return await this.account.createEmailSession(email, password);
         } catch (error) {
@@ -40,14 +40,14 @@ export class AuthService {
 
     async getCurrentUser() {
         try {
-            return await this.account.get();
+            const user = await this.account.get(); 
+            return user;
         } catch (error) {
-            console.log("Appwrite serive :: getCurrentUser :: error", error);
+         
+            return null;
         }
-
-        return null;
     }
-
+    
     async logout() {
 
         try {

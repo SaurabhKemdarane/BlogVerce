@@ -7,10 +7,13 @@ import { useSelector } from "react-redux";
 
 export default function Post() {
     const [post, setPost] = useState(null);
-    const [isAuthor, setIsAuthor] = useState(true); // Initialize isAuthor state
+    const [isAuthor, setIsAuthor] = useState(false);
     const { slug } = useParams();
     const navigate = useNavigate();
     const userData = useSelector((state) => state.auth.userData);
+
+   
+
 
     useEffect(() => {
         const fetchPost = async () => {
@@ -19,9 +22,10 @@ export default function Post() {
                     const fetchedPost = await appwriteService.getPost(slug);
                     if (fetchedPost) {
                         setPost(fetchedPost);
-                        // Check if the current user is the author
+                        
                         if (userData && fetchedPost.userId === userData.$id) {
                             setIsAuthor(true);
+                            console.log(userData.name ,fetchedPost.userId);
                         }
                     } else {
                         navigate("/");
@@ -36,7 +40,8 @@ export default function Post() {
         };
 
         fetchPost();
-    }, [slug, navigate, userData]);
+    }, [slug,]);
+  
 
     const deletePost = async () => {
         if (post) {
@@ -76,6 +81,7 @@ export default function Post() {
                     )}
                 </div>
                 <div className="w-full mb-6">
+                   
                     <h1 className="text-2xl font-bold text-white">{post.title}</h1>
                 </div>
                 <div className="browser-css text-white">

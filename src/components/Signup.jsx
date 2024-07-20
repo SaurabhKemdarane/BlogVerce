@@ -1,30 +1,33 @@
-import React, { useState } from 'react'
-import authService from '../appwrite/auth'
-import { Link, useNavigate } from 'react-router-dom'
-import { login } from '../store/authSlice'
-import { Button, Input, Logo } from './index.js'
-import { useDispatch } from 'react-redux'
-import { useForm } from 'react-hook-form'
+import React, { useState } from 'react';
+import authService from '../appwrite/auth';
+import { Link, useNavigate } from 'react-router-dom';
+import { login } from '../store/authSlice';
+import { Button, Input, Logo } from './index.js';
+import { useDispatch } from 'react-redux';
+import { useForm } from 'react-hook-form';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function Signup() {
-    const navigate = useNavigate()
-    const [error, setError] = useState("")
-    const dispatch = useDispatch()
-    const { register, handleSubmit } = useForm()
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const { register, handleSubmit } = useForm();
 
     const create = async (data) => {
-        setError("")
         try {
-            const userData = await authService.createAccount(data)
+            const userData = await authService.createAccount(data);
             if (userData) {
-                const userData = await authService.getCurrentUser()
-                if (userData) dispatch(login(userData));
-                navigate("/")
+                const userData = await authService.getCurrentUser();
+                if (userData) {
+                    dispatch(login(userData));
+                    navigate("/");
+                }
             }
         } catch (error) {
-            setError(error.message)
+            console.error('Signup error:', error);
+            toast.error(error.message || 'Signup failed. Please try again.');
         }
-    }
+    };
 
     return (
         <div className='flex flex-col items-center justify-center w-full h-screen bg-zinc-900'>
@@ -34,7 +37,7 @@ function Signup() {
                         <Logo width='100%' />
                     </span>
                 </div>
-                <h2 className="text-center text-2xl font-bold leading-tight  text-white">Sign up to create account</h2>
+                <h2 className="text-center text-2xl font-bold leading-tight text-white">Sign up to create account</h2>
                 <p className="mt-2 text-center text-base text-gray-400">
                     Already have an account?&nbsp;
                     <Link
@@ -44,18 +47,15 @@ function Signup() {
                         Sign In
                     </Link>
                 </p>
-                {error && <p className="text-red-600 mt-8 text-center">{error}</p>}
-
-                <form onSubmit={handleSubmit(create)}>
+                <form onSubmit={handleSubmit(create)} className='mt-8'>
                     <div className='space-y-5'>
-                    <Input className
-                        label="Full Name: "
-                        placeholder="Enter your full name"
-                        {...register("name", {
-                            required: true,
-                        })}
+                        <Input
+                            label="Full Name: "
+                            placeholder="Enter your full name"
+                            {...register("name", {
+                                required: true,
+                            })}
                         />
-
                         <Input
                             label="Email: "
                             placeholder="Enter your email"
@@ -63,7 +63,8 @@ function Signup() {
                             {...register("email", {
                                 required: true,
                                 validate: {
-                                    matchPatern: (value) => /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(value) ||
+                                    matchPattern: (value) =>
+                                        /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(value) ||
                                         "Email address must be a valid address",
                                 }
                             })}
@@ -83,8 +84,9 @@ function Signup() {
                 </form>
             </div>
             <hr className='w-1/2 mt-8 mb-4 border-gray-500 border-t-2' />
+            <ToastContainer />
         </div>
-    )
+    );
 }
 
-export default Signup
+export default Signup;
